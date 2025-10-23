@@ -24,7 +24,7 @@ export const AnimatedSphere: React.FC<AnimatedSphereProps> = ({
 
   // Size configurations
   const sizeConfig = {
-    small: { canvas: 300, radius: 70, particles: 30 },
+    small: { canvas: 200, radius: 70, particles: 30 },
     medium: { canvas: 400, radius: 100, particles: 40 },
     large: { canvas: 500, radius: 120, particles: 50 }
   };
