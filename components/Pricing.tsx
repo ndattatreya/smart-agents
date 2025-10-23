@@ -94,6 +94,43 @@ const PricingPage: React.FC = () => {
     return isAnnual ? Math.round(monthlyPrice * 0.83) : monthlyPrice;
   };
 
+  const handleCheckout = (plan: Plan) => {
+    if (plan.monthlyPrice === 0) {
+      alert("You're already on the Free plan!");
+      return;
+    }
+
+    const amount = getPrice(plan.monthlyPrice) * 100; // Convert to paise
+
+    const options = {
+      key: 'rzp_test_5NFOiDIrADrIHb', // 🔒 Replace with your Razorpay key
+      amount,
+      currency: "INR",
+      name: "Nava AI",
+      description: `Upgrade to ${plan.name} Plan`,
+      image: "/logo.png", // optional
+      handler: function (response: any) {
+        alert(`Payment successful! Payment ID: ${response.razorpay_payment_id}`);
+        // TODO: send this payment info to your backend to verify and upgrade user
+      },
+      prefill: {
+        name: "John Doe",
+        email: "user@example.com",
+        contact: "9999999999",
+      },
+      notes: {
+        plan_name: plan.name,
+      },
+      theme: {
+        color: "#3b82f6",
+      },
+    };
+
+    const rzp = new (window as any).Razorpay(options);
+    rzp.open();
+  };
+
+
   return (
     <div
       style={{
@@ -254,16 +291,17 @@ const PricingPage: React.FC = () => {
                   background: plan.isCurrent
                     ? "#3a3a3a"
                     : plan.isBestValue
-                    ? "#3b82f6"
-                    : "white",
+                      ? "#3b82f6"
+                      : "white",
                   color: plan.isCurrent
                     ? "#9ca3af"
                     : plan.isBestValue
-                    ? "white"
-                    : "black",
+                      ? "white"
+                      : "black",
                   fontSize: "16px",
                   transition: "all 0.3s",
                 }}
+                onClick={() => !plan.isCurrent && handleCheckout(plan)}
                 onMouseEnter={(e) => {
                   if (!plan.isCurrent) e.currentTarget.style.opacity = "0.9";
                 }}
@@ -273,6 +311,7 @@ const PricingPage: React.FC = () => {
               >
                 {plan.isCurrent ? "Current plan" : `Upgrade to ${plan.name}`}
               </button>
+
 
               {/* Features */}
               <div>
