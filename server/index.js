@@ -4,6 +4,7 @@ import 'dotenv/config';
 import session from "express-session";
 import passport from "./config/passport.js"; // <-- Google OAuth config
 import connectDB from "./config/db.js";
+import i18next, { middleware } from "./config/i18n.js";
 
 // Routes
 import sessionsRoutes from "./routes/sessions.js";
@@ -48,6 +49,9 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
+// Initialize i18n middleware
+app.use(middleware.handle(i18next));
+
 // Request logger (for debugging)
 app.use((req, res, next) => {
   console.log(`${new Date().toISOString()} - ${req.method} ${req.originalUrl}`);
@@ -66,7 +70,7 @@ app.use("/auth", googleAuthRoutes); // <-- Google OAuth endpoints
 app.get("/api/health", (req, res) => {
   res.status(200).json({
     success: true,
-    message: "Server is running",
+    message: req.t('api.welcome'),
     timestamp: new Date().toISOString(),
   });
 });

@@ -6,6 +6,7 @@ import { Bell, Moon, Sun, Menu, LogOut, UserPlus, Shield } from 'lucide-react';
 import { useTheme } from './ThemeProvider';
 import { MobileAppPreview } from './MobileAppPreview';
 import { ShiningStars } from './ShiningStars';
+import { LanguageSwitcher } from './LanguageSwitcher';
 
 interface NavbarProps {
   onToggleSidebar: () => void;
@@ -78,6 +79,9 @@ export function Navbar({ onToggleSidebar, onToggleAppPreview, showAppPreview, on
             <Sun className="w-5 h-5 text-foreground/70" />
           )}
         </button>
+
+        {/* Language Switcher */}
+        <LanguageSwitcher variant="ghost" size="sm" />
 
         {/* Profile with dropdown */}
         <DropdownMenu open={userDropdownOpen} onOpenChange={setUserDropdownOpen}>

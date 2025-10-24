@@ -1,7 +1,9 @@
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { AnimatedSphere } from './AnimatedSphere';
 import { ShiningStars } from './ShiningStars';
 import { ImageWithFallback } from './figma/ImageWithFallback';
+import { LanguageSwitcher } from './LanguageSwitcher';
 import { Sparkles, Zap, Brain, Users, Code, Shield } from "lucide-react";
 
 interface LandingPageProps {
@@ -9,36 +11,38 @@ interface LandingPageProps {
 }
 
 export const LandingPage: React.FC<LandingPageProps> = ({ onNavigateToLogin }) => {
+  const { t } = useTranslation();
+  
   const features = [
     {
       icon: Brain,
-      title: 'AI-Powered Intelligence',
-      description: 'Leverage cutting-edge AI models to automate complex tasks and generate intelligent solutions with natural language commands.'
+      title: t('features.aiPowered.title'),
+      description: t('features.aiPowered.description')
     },
     {
       icon: Zap,
-      title: 'Lightning Fast Performance',
-      description: 'Experience real-time code generation and instant results with our optimized AI engine built for speed and efficiency.'
+      title: t('features.lightningFast.title'),
+      description: t('features.lightningFast.description')
     },
     {
       icon: Code,
-      title: 'Smart Code Generation',
-      description: 'Generate production-ready code snippets, complete applications, and technical solutions with context-aware AI assistance.'
+      title: t('features.smartCode.title'),
+      description: t('features.smartCode.description')
     },
     {
       icon: Sparkles,
-      title: 'Interactive Sandbox',
-      description: 'Test and preview your AI-generated code in a live environment with instant feedback and iterative improvements.'
+      title: t('features.interactiveSandbox.title'),
+      description: t('features.interactiveSandbox.description')
     },
     {
       icon: Shield,
-      title: 'Secure & Private',
-      description: 'Your data and projects are protected with enterprise-grade security. We prioritize privacy and never share your information.'
+      title: t('features.secure.title'),
+      description: t('features.secure.description')
     },
     {
       icon: Users,
-      title: 'Collaborative Workflows',
-      description: 'Work seamlessly with your team, share AI-generated assets, and collaborate on projects in real-time.'
+      title: t('features.collaborative.title'),
+      description: t('features.collaborative.description')
     }
   ];
 
@@ -65,40 +69,44 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigateToLogin }) =
             <span className="font-semibold text-lg">Nava AI</span>
           </div>
 
-          <div className="hidden md:flex items-center gap-8">
+          <div className="hidden md:flex items-center gap-4">
             <button
               onClick={() => scrollToSection('about')}
               className="text-muted-foreground hover:text-foreground transition-colors"
             >
-              About
+              {t('navigation.about')}
             </button>
             <button
               onClick={() => scrollToSection('features')}
               className="text-muted-foreground hover:text-foreground transition-colors"
             >
-              Features
+              {t('navigation.features')}
             </button>
             <button
               onClick={() => scrollToSection('creators')}
               className="text-muted-foreground hover:text-foreground transition-colors"
             >
-              Creators
+              {t('navigation.creators')}
             </button>
+            <LanguageSwitcher />
             <button
               onClick={onNavigateToLogin}
               className="px-6 py-2 rounded-lg bg-gradient-to-r from-[#7B61FF] to-[#3B82F6] text-white hover:shadow-glow transition-all"
             >
-              Login
+              {t('navigation.login')}
             </button>
           </div>
 
-          {/* Mobile menu button */}
-          <button
-            onClick={onNavigateToLogin}
-            className="md:hidden px-4 py-2 rounded-lg bg-gradient-to-r from-[#7B61FF] to-[#3B82F6] text-white"
-          >
-            Login
-          </button>
+          {/* Mobile menu */}
+          <div className="md:hidden flex items-center gap-2">
+            <LanguageSwitcher size="sm" />
+            <button
+              onClick={onNavigateToLogin}
+              className="px-4 py-2 rounded-lg bg-gradient-to-r from-[#7B61FF] to-[#3B82F6] text-white"
+            >
+              {t('navigation.login')}
+            </button>
+          </div>
         </nav>
       </motion.header>
 
@@ -114,25 +122,24 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigateToLogin }) =
               className="text-center lg:text-left"
             >
               <h1 className="text-2xl sm:text-4xl md:text-5xl font-bold mb-3 sm:mb-5 bg-gradient-to-r from-[#7B61FF] to-[#3B82F6] bg-clip-text text-transparent leading-tight">
-                Welcome to Nava AI
+                {t('landing.title')}
               </h1>
 
               <p className="text-base sm:text-lg md:text-xl text-muted-foreground mb-6 sm:mb-8 px-2 sm:px-0">
-                Transform your ideas into reality with our advanced AI-powered platform.
-                Generate code, create applications, and innovate faster than ever before.
+                {t('landing.subtitle')}
               </p>
               <div className="flex flex-col sm:flex-row justify-center lg:justify-start gap-4 sm:gap-6">
                 <button
                   onClick={onNavigateToLogin}
                   className="px-6 sm:px-8 py-3 rounded-xl bg-gradient-to-r from-[#7B61FF] to-[#3B82F6] text-white shadow-glow-hover transition-all w-full sm:w-auto"
                 >
-                  Get Started
+                  {t('landing.getStarted')}
                 </button>
                 <button
                   onClick={() => scrollToSection('features')}
                   className="px-6 sm:px-8 py-3 rounded-xl bg-card/50 backdrop-blur-sm hover:bg-card transition-all w-full sm:w-auto"
                 >
-                  Learn More
+                  {t('landing.learnMore')}
                 </button>
               </div>
             </motion.div>
@@ -162,12 +169,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigateToLogin }) =
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
           >
-            <h2 className="text-4xl font-bold mb-4">About Nava AI</h2>
+            <h2 className="text-4xl font-bold mb-4">{t('landing.aboutTitle')}</h2>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              Nava AI is a next-generation platform that combines artificial intelligence
-              with intuitive design to help developers, creators, and businesses build
-              powerful applications faster. Our mission is to democratize AI and make
-              advanced technology accessible to everyone.
+              {t('landing.aboutDescription')}
             </p>
           </motion.div>
 
@@ -230,9 +234,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigateToLogin }) =
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
           >
-            <h2 className="text-4xl font-bold mb-4">Powerful Features</h2>
+            <h2 className="text-4xl font-bold mb-4">{t('landing.featuresTitle')}</h2>
             <p className="text-xl text-muted-foreground">
-              Everything you need to bring your AI-powered projects to life
+              {t('landing.featuresSubtitle')}
             </p>
           </motion.div>
 
@@ -441,9 +445,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigateToLogin }) =
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
           >
-            <h2 className="text-4xl font-bold mb-4">Meet the Creators</h2>
+            <h2 className="text-4xl font-bold mb-4">{t('landing.creatorsTitle')}</h2>
             <p className="text-xl text-muted-foreground">
-              Built by a passionate team dedicated to pushing the boundaries of AI
+              {t('landing.creatorsSubtitle')}
             </p>
           </motion.div>
 
@@ -535,16 +539,16 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigateToLogin }) =
             transition={{ duration: 0.6 }}
           >
             <h2 className="text-4xl md:text-5xl font-bold mb-6">
-              Ready to Get Started?
+              {t('landing.ctaTitle')}
             </h2>
             <p className="text-xl text-muted-foreground mb-8">
-              Join thousands of developers and creators using Nava AI to build the future
+              {t('landing.ctaSubtitle')}
             </p>
             <button
               onClick={onNavigateToLogin}
               className="px-10 py-4 rounded-xl bg-gradient-to-r from-[#7B61FF] to-[#3B82F6] text-white text-lg shadow-glow-hover transition-all"
             >
-              Start Creating Now
+              {t('landing.startCreating')}
             </button>
           </motion.div>
         </div>
@@ -558,7 +562,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigateToLogin }) =
       {/* Footer */}
       <footer className="py-12 px-6">
         <div className="max-w-7xl mx-auto text-center text-muted-foreground">
-          <p>© 2025 Nava AI. All rights reserved.</p>
+          <p>{t('landing.footer')}</p>
         </div>
       </footer>
     </div>
