@@ -23,15 +23,15 @@ export function Navbar({ onToggleSidebar, onToggleAppPreview, showAppPreview, on
       {/* Left side */}
       <div className="flex items-center space-x-6">
         {/* Menu button for sidebar toggle */}
-        <button 
+        <button
           onClick={onToggleSidebar}
           className="p-2 hover:bg-muted/50 rounded-lg transition-colors lg:hidden"
         >
           <Menu className="w-5 h-5 text-foreground/70" />
         </button>
-        
+
         {/* Logo for desktop - clicking toggles sidebar with Shining Stars */}
-        <button 
+        <button
           onClick={onToggleSidebar}
           className="hidden lg:flex items-center space-x-3 hover:opacity-80 transition-opacity"
         >
@@ -40,8 +40,8 @@ export function Navbar({ onToggleSidebar, onToggleAppPreview, showAppPreview, on
             Nava <span className="text-primary">AI</span>
           </span>
         </button>
-        
-        <button 
+
+        <button
           onClick={onToggleAppPreview}
           className="text-foreground hover:text-[#7B61FF] transition-colors"
         >
@@ -54,10 +54,6 @@ export function Navbar({ onToggleSidebar, onToggleAppPreview, showAppPreview, on
 
       {/* Right side */}
       <div className="flex items-center space-x-4">
-        {/* Upgrade button */}
-        <Button className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white px-4 py-2 rounded-lg transition-all duration-200">
-          Upgrade
-        </Button>
 
         {/* Notifications */}
         <button className="p-2 hover:bg-muted/50 rounded-lg transition-colors">
@@ -65,7 +61,7 @@ export function Navbar({ onToggleSidebar, onToggleAppPreview, showAppPreview, on
         </button>
 
         {/* Theme toggle */}
-        <button 
+        <button
           onClick={toggleTheme}
           onKeyDown={(e) => {
             if (e.key === 'Enter' || e.key === ' ') {
@@ -88,7 +84,7 @@ export function Navbar({ onToggleSidebar, onToggleAppPreview, showAppPreview, on
           <DropdownMenuTrigger asChild>
             <button className="flex items-center space-x-3 hover:bg-muted/50 rounded-lg p-2 transition-colors">
               <Avatar className="w-8 h-8">
-                <AvatarFallback className="bg-gradient-to-r from-[#7B61FF] to-[#9F7AEA] text-white text-sm">
+                <AvatarFallback className="bg-gradient-to-r from-[#7B61FF] to-[#9F7AEA] text-white text-base rounded-full w-10 h-10 flex items-center justify-center">
                   YK
                 </AvatarFallback>
               </Avatar>
@@ -112,7 +108,7 @@ export function Navbar({ onToggleSidebar, onToggleAppPreview, showAppPreview, on
               Account Settings
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem 
+            <DropdownMenuItem
               className="cursor-pointer hover:bg-destructive/10 text-destructive"
               onClick={onLogout}
             >
@@ -122,7 +118,7 @@ export function Navbar({ onToggleSidebar, onToggleAppPreview, showAppPreview, on
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-      
+
       {/* Mobile App Preview Modal */}
       <MobileAppPreview isOpen={showAppPreview} onClose={onToggleAppPreview} />
     </div>

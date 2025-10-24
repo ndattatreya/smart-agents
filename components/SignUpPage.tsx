@@ -1,6 +1,10 @@
+import { useState, useEffect } from 'react';
 import { Button } from './ui/button';
-import { AnimatedSphere } from './AnimatedSphere';
+import { Input } from './ui/input';
+import { Label } from './ui/label';
 import { ShiningStars } from './ShiningStars';
+import { authAPI, setAuthToken, setAuthUser } from '../lib/api';
+import { signInWithGoogle, signInWithMicrosoft, signInWithApple, initGoogleOAuth } from '../lib/oauth';
 
 interface SignUpPageProps {
   onSignUp: () => void;
@@ -8,6 +12,102 @@ interface SignUpPageProps {
 }
 
 export function SignUpPage({ onSignUp, onNavigateToLogin }: SignUpPageProps) {
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [showEmailForm, setShowEmailForm] = useState(false);
+
+  // Initialize Google OAuth on component mount
+  useEffect(() => {
+    initGoogleOAuth().catch(err => {
+      // Silently fail if OAuth is not configured
+      console.log('Google OAuth not configured:', err.message);
+    });
+  }, []);
+
+  const handleOAuthSignUp = async (provider: 'google' | 'microsoft' | 'apple') => {
+    setError('');
+    setLoading(true);
+
+    try {
+      let userData;
+      
+      switch (provider) {
+        case 'google':
+          userData = await signInWithGoogle();
+          break;
+        case 'microsoft':
+          userData = await signInWithMicrosoft();
+          break;
+        case 'apple':
+          userData = await signInWithApple();
+          break;
+        default:
+          throw new Error('Invalid provider');
+      }
+
+      // Send OAuth data to backend
+      const response = await authAPI.oauthLogin(provider, userData);
+      
+      if (response.success) {
+        setAuthToken(response.data.token);
+        setAuthUser(response.data.user);
+        onSignUp();
+      }
+    } catch (err: any) {
+      console.error(`${provider} signup error:`, err);
+      
+      // Provide user-friendly error messages
+      let errorMessage = err.message;
+      if (errorMessage.includes('not configured') || errorMessage.includes('client_id')) {
+        errorMessage = `${provider.charAt(0).toUpperCase() + provider.slice(1)} sign-up is not configured yet. Please use email/password registration or contact support.`;
+      }
+      
+      setError(errorMessage || `Failed to sign up with ${provider}. Please try again.`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+
+    // Validate passwords match
+    if (password !== confirmPassword) {
+      setError('Passwords do not match');
+      return;
+    }
+
+    // Validate password length
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters long');
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const response = await authAPI.signup({ name, email, password });
+      
+      if (response.success) {
+        // Store token and user data
+        setAuthToken(response.data.token);
+        setAuthUser(response.data.user);
+        
+        // Call onSignUp to update app state
+        onSignUp();
+      }
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Registration failed. Please try again.');
+      console.error('Signup error:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
   return (
     <div className="min-h-screen bg-black relative overflow-hidden">
       {/* Video Background */}
@@ -61,11 +161,19 @@ export function SignUpPage({ onSignUp, onNavigateToLogin }: SignUpPageProps) {
               <p className="text-gray-300 text-sm">Start creating with AI today</p>
             </div>
 
+            {/* Error display */}
+            {error && (
+              <div className="mb-4 bg-red-500/20 border border-red-500/50 text-red-200 px-4 py-3 rounded-xl text-sm">
+                {error}
+              </div>
+            )}
+
             {/* Social login buttons */}
             <div className="space-y-2 mb-4">
               <Button 
-                onClick={onSignUp}
-                className="w-full bg-white/10 hover:bg-white/20 text-white rounded-xl py-2 text-sm transition-all duration-200 backdrop-blur-sm"
+                onClick={() => handleOAuthSignUp('google')}
+                disabled={loading}
+                className="w-full bg-white/10 hover:bg-white/20 text-white rounded-xl py-2 text-sm transition-all duration-200 backdrop-blur-sm disabled:opacity-50"
                 variant="outline"
               >
                 <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24">
@@ -78,8 +186,9 @@ export function SignUpPage({ onSignUp, onNavigateToLogin }: SignUpPageProps) {
               </Button>
               
               <Button 
-                onClick={onSignUp}
-                className="w-full bg-white/10 hover:bg-white/20 text-white rounded-xl py-2 text-sm transition-all duration-200 backdrop-blur-sm"
+                onClick={() => handleOAuthSignUp('microsoft')}
+                disabled={loading}
+                className="w-full bg-white/10 hover:bg-white/20 text-white rounded-xl py-2 text-sm transition-all duration-200 backdrop-blur-sm disabled:opacity-50"
                 variant="outline"
               >
                 <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24">
@@ -92,12 +201,13 @@ export function SignUpPage({ onSignUp, onNavigateToLogin }: SignUpPageProps) {
               </Button>
               
               <Button 
-                onClick={onSignUp}
-                className="w-full bg-white/10 hover:bg-white/20 text-white rounded-xl py-2 text-sm transition-all duration-200 backdrop-blur-sm"
+                onClick={() => handleOAuthSignUp('apple')}
+                disabled={loading}
+                className="w-full bg-white/10 hover:bg-white/20 text-white rounded-xl py-2 text-sm transition-all duration-200 backdrop-blur-sm disabled:opacity-50"
                 variant="outline"
               >
                 <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24">
-                  <path fill="#000000" d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
+                  <path fill="#FFFFFF" d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
                 </svg>
                 Sign up with Apple
               </Button>
@@ -111,12 +221,95 @@ export function SignUpPage({ onSignUp, onNavigateToLogin }: SignUpPageProps) {
             </div>
 
             {/* Email button */}
-            <Button 
-              onClick={onSignUp}
-              className="w-full bg-white text-black hover:bg-gray-100 rounded-xl py-2 text-sm transition-all duration-200"
-            >
-              Continue with Email
-            </Button>
+            {!showEmailForm ? (
+              <Button 
+                onClick={() => setShowEmailForm(true)}
+                className="w-full bg-white text-black hover:bg-gray-100 rounded-xl py-2 text-sm transition-all duration-200"
+              >
+                Continue with Email
+              </Button>
+            ) : (
+              <form onSubmit={handleSubmit} className="space-y-4">
+                {error && (
+                  <div className="bg-red-500/20 border border-red-500/50 text-red-200 px-4 py-3 rounded-xl text-sm">
+                    {error}
+                  </div>
+                )}
+                
+                <div className="space-y-2">
+                  <Label htmlFor="name" className="text-white text-sm">Full Name</Label>
+                  <Input
+                    id="name"
+                    type="text"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    placeholder="John Doe"
+                    required
+                    minLength={2}
+                    maxLength={50}
+                    className="bg-white/10 border-white/20 text-white placeholder:text-gray-400 rounded-xl focus:border-white/40"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="email" className="text-white text-sm">Email</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="your@email.com"
+                    required
+                    className="bg-white/10 border-white/20 text-white placeholder:text-gray-400 rounded-xl focus:border-white/40"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="password" className="text-white text-sm">Password</Label>
+                  <Input
+                    id="password"
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="••••••••"
+                    required
+                    minLength={6}
+                    className="bg-white/10 border-white/20 text-white placeholder:text-gray-400 rounded-xl focus:border-white/40"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="confirmPassword" className="text-white text-sm">Confirm Password</Label>
+                  <Input
+                    id="confirmPassword"
+                    type="password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    placeholder="••••••••"
+                    required
+                    minLength={6}
+                    className="bg-white/10 border-white/20 text-white placeholder:text-gray-400 rounded-xl focus:border-white/40"
+                  />
+                </div>
+
+                <Button 
+                  type="submit"
+                  disabled={loading}
+                  className="w-full bg-white text-black hover:bg-gray-100 rounded-xl py-2 text-sm transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {loading ? 'Creating account...' : 'Create Account'}
+                </Button>
+
+                <Button 
+                  type="button"
+                  onClick={() => setShowEmailForm(false)}
+                  variant="ghost"
+                  className="w-full text-white hover:bg-white/10 rounded-xl py-2 text-sm transition-all duration-200"
+                >
+                  Back to social login
+                </Button>
+              </form>
+            )}
 
             {/* Footer */}
             <div className="mt-6 text-center space-y-3">

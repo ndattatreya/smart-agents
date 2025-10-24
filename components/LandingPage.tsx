@@ -113,9 +113,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigateToLogin }) =
               transition={{ duration: 0.8, delay: 0.2 }}
               className="text-center lg:text-left"
             >
-              <h1 className="text-3xl sm:text-5xl md:text-6xl font-bold mb-4 sm:mb-6 bg-gradient-to-r from-[#7B61FF] to-[#3B82F6] bg-clip-text text-transparent leading-tight">
+              <h1 className="text-2xl sm:text-4xl md:text-5xl font-bold mb-3 sm:mb-5 bg-gradient-to-r from-[#7B61FF] to-[#3B82F6] bg-clip-text text-transparent leading-tight">
                 Welcome to Nava AI
               </h1>
+
               <p className="text-base sm:text-lg md:text-xl text-muted-foreground mb-6 sm:mb-8 px-2 sm:px-0">
                 Transform your ideas into reality with our advanced AI-powered platform.
                 Generate code, create applications, and innovate faster than ever before.
