@@ -1,6 +1,6 @@
 import express from "express";
 import cors from "cors";
-import dotenv from "dotenv";
+import 'dotenv/config';
 import session from "express-session";
 import passport from "./config/passport.js"; // <-- Google OAuth config
 import connectDB from "./config/db.js";
@@ -11,7 +11,7 @@ import sandboxRoutes from "./routes/sandboxRoutes.js";
 import authRoutes from "./routes/auth.js";
 import googleAuthRoutes from "./routes/googleAuth.js"; // <-- New Google OAuth routes
 
-dotenv.config();
+
 const app = express();
 
 // ========================
