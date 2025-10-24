@@ -22,13 +22,29 @@ connectDB();
 // ========================
 // 2. MIDDLEWARE
 // ========================
+
+const allowedOrigins = [
+  "http://localhost:5173",              // local dev
+  "https://smart-agents.vercel.app",    // your deployed frontend
+];
+
 app.use(
   cors({
-    origin: [
-      "http://localhost:5173",
-      "https://smart-agents.vercel.app"
-    ],
-    credentials: true,
+    origin: allowedOrigins,
+    credentials: true,                  // allow cookies
+  })
+);
+
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      secure: true,        // ✅ Required for HTTPS (Vercel uses HTTPS)
+      sameSite: "none",    // ✅ Allows cookies from cross-origin (frontend)
+      httpOnly: true,      // ✅ Prevents JS access to cookies
+    },
   })
 );
 
